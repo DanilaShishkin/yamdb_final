@@ -59,7 +59,7 @@ jobs:
           push: true
           file: api_yamdb/Dockerfile
           tags: danilashishkin/api_yamdb:latest
-deploy:
+  deploy:
     runs-on: ubuntu-latest
     needs: build_and_push_to_docker_hub
     steps:
