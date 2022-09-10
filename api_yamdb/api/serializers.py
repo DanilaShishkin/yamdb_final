@@ -3,9 +3,7 @@ import datetime as dt
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
-
-from reviews.models import (Categories, Comments, Genres, Review,
-                            Title, User)
+from reviews.models import Categories, Comments, Genres, Review, Title, User
 
 
 class GenreSerializer(serializers.ModelSerializer):

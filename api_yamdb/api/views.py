@@ -1,24 +1,23 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.db.models import Avg
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, mixins, permissions, status,
-                            viewsets)
+from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import action
-
 from reviews.models import Categories, Comments, Genres, Review, Title, User
+
 from .filter import Titlefilter
 from .permissions import Me, MeAdmin, ReadOrAdmin, WriteOwnerOrPersonal
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, MeSerializer, ReviewSerializer,
+                          GenreSerializer, GettingATokenSerializer,
+                          MeSerializer, ReviewSerializer,
                           TitlesCreateSerializer, TitlesSerializer,
-                          UserSerializer, UserSignupSerializer,
-                          GettingATokenSerializer)
+                          UserSerializer, UserSignupSerializer)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
