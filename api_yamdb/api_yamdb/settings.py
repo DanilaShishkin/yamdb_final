@@ -59,7 +59,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'api_yamdb.wsgi.application'
+WSGI_APPLICATION = 'api_yamdb.wsgi'
 
 
 # Database
