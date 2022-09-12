@@ -1,144 +1,104 @@
-# ABOUT THE PROJECT:
+# YaMDb project
 
-The YaMDb project collects user reviews of works. The works are divided into categories: "Books", "Films", "Music". The list of categories can be expanded by the administrator (for example, you can add the category "Fine Art" or "Jewelry").
-The works themselves are not stored in YaMDb, you can't watch a movie or listen to music here.
-Grateful or outraged users leave text reviews for the works and give the work a rating in the range from one to ten. The user can leave only one review for one work.
+![Yamdb_Project Workflow Status](https://github.com/danilashishkin/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg?branch=master&event=push)
 
+Проект YaMDb собирает отзывы пользователей на произведения. Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
+Произведению может быть присвоен жанр. Новые жанры может создавать только администратор.
+Читатели оставляют к произведениям текстовые отзывы и выставляют произведению рейтинг (оценку в диапазоне от одного до десяти).
+Cредняя оценка произведения высчитывается автоматически.
 
-## How to launch a project:
+Аутентификация по JWT-токену
 
-Clone the repository and go to it on the command line:
+Поддерживает методы GET, POST, PUT, PATCH, DELETE
 
-```
-git clone #######
-```
+Предоставляет данные в формате JSON
 
-Go to dir infra/:
+Cоздан в команде из трёх человек с использованим Git в рамках учебного курса Яндекс.Практикум.
 
-```
-cd infra
-```
+## Стек технологий
+- проект написан на Python с использованием Django REST Framework
+- библиотека Simple JWT - работа с JWT-токеном
+- библиотека django-filter - фильтрация запросов
+- базы данны - SQLite3
+- автоматическое развертывание проекта - Docker, docker-compose
+- система управления версиями - git
+- настроен непрерывный процесс разработки, тестирования и деплоя кода на боевой сервер CI/CD
 
-Create .env file:
+## Шаблон наполнения env-файла
 
-```
-nano .env
-```
-Template
-```
-DB_ENGINE=django.db.backends.postgresql # indicate that we are working with postgresql
-DB_NAME=postgres # database name
-POSTGRES_USER=postgres # login to connect to the database
-POSTGRES_PASSWORD=Proverka7 # password to connect to the database (set your own)
-DB_HOST=db # name of the service (container)
-DB_PORT=5432 # port for connecting to the database
-```
-
-Create and start project:
-
-```
-docker-compose up
+```bash
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=POSTGRES
+POSTGRES_PASSWORD=PASSWORD
+DB_HOST=db
+DB_PORT=5432
+SECRET_KEY=secretkey
 ```
 
-In another console, execute migrations, create superuser and copy static files:
+## Запуск приложения в контейнерах
+
+Выполнить docker-compose:
+
+```
+docker-compose up -d
+```
+
+Выполнить миграции:
 
 ```
 docker-compose exec web python manage.py migrate
+```
+
+Создать суперюзера:
+
+```
 docker-compose exec web python manage.py createsuperuser
-docker-compose exec web python manage.py collectstatic --no-input 
 ```
 
-Or you can load dump database:
+Собрать статику:
 
 ```
-docker-compose exec web python manage.py loaddata fixtures.json 
+docker-compose exec web python manage.py collectstatic --no-input
 ```
 
-## authorization
-
-###Registering a new user
-
-Send a POST request to /api/v1/auth/signup/ specifying username and email in the request.
+## Загрузка базы данными
 
 ```
-{
-  "email": "string",
-  "username": "string"
-}
+docker-compose exec web python manage.py loaddata fixtures.json
 ```
-**Attention!!! It is forbidden to use the name 'me' as a username.**
-
-A confirmation code will be sent in response to the email.
-
-###Getting a JWT token
-
-Send a POST request to /api/v1/auth/token/ specifying the username and confirmation code received by email in the request
+## Страница приложения:
 
 ```
-{
-  "username": "string",
-  "confirmation_code": "string"
-}
-```
-A token will be sent in response to the email.
-
-```
-{
-  "token": "string"
-}
+ http://localhost/admin/
 ```
 
+## Алгоритм регистрации пользователей
+- Пользователь отправляет запрос с параметрами *email* и *username* на */auth/email/*.
+- YaMDB отправляет письмо с кодом подтверждения (confirmation_code) на адрес *email* .
+- Пользователь отправляет запрос с параметрами *email* и *confirmation_code* на */auth/token/*, в ответе на запрос ему приходит token (JWT-токен).
 
-# Example of using the API:
+## Ресурсы API YaMDb
 
-##Getting a list of all works
+- Ресурс AUTH: аутентификация.
+- Ресурс USERS: пользователи.
+- Ресурс TITLES: произведения, к которым пишут отзывы (определённый фильм, книга или песня).
+- Ресурс CATEGORIES: категории (типы) произведений («Фильмы», «Книги», «Музыка»).
+- Ресурс GENRES: жанры произведений. Одно произведение может быть привязано к нескольким жанрам.
+- Ресурс REVIEWS: отзывы на произведения. Отзыв привязан к определённому произведению.
+- Ресурс COMMENTS: комментарии к отзывам. Комментарий привязан к определённому отзыву.
 
-Send a GET request to /api/v1/titles/.
-In response, you will receive a json with a list of all the works:
-
-```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "id": 0,
-        "name": "string",
-        "year": 0,
-        "rating": 0,
-        "description": "string",
-        "genre": [
-          {
-            "name": "string",
-            "slug": "string"
-          }
-        ],
-        "category": {
-          "name": "string",
-          "slug": "string"
-        }
-      }
-    ]
-  }
-]
-```
-
-##Adding a work
-
-Send a POST request to /api/v1/titles/ with a json string:
+## Документация (запросы для работы с API):
 
 ```
-{
-  "name": "string",
-  "year": 0,
-  "description": "string",
-  "genre": [
-    "string"
-  ],
-  "category": "string"
-}
+ http://localhost/redoc/
 ```
-Author Danil Shishkin
-MIT License
+
+<<<<<<< HEAD
+>**Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего).**
+>**При добавлении нового произведения требуется указать уже существующие категорию и жанр.**
+
+=======
+>**It is not allowed to add works that have not yet been released (the year of release cannot be greater than the current one).**
+>**When adding a new work, you need to specify the already existing category and genre.**
+>>>>>>> fe4fad4d8488f5526878f58e5d9020ff2ad76a74
