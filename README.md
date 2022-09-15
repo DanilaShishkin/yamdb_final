@@ -74,7 +74,6 @@ docker-compose exec web python manage.py loaddata fixtures.json
  http://localhost/admin/
 
  http://51.250.86.93/redoc/
- # не уверен, что загрузилась статика, думаю, так не должно быть. Буду рад подсказке:).
  http://51.250.86.93/admin/
  http://51.250.86.93/api/v1/
 ```
